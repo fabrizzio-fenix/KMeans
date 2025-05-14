@@ -105,27 +105,55 @@ def cargar_tweets():
 def cargar_diccionario():
     """
     Carga el diccionario de palabras relacionadas con astrología y sus frecuencias.
+    Este diccionario se utiliza para enriquecer el análisis de palabras relevantes.
 
     Returns:
-        pandas.DataFrame: DataFrame con el diccionario cargado
+        pandas.DataFrame: DataFrame con el diccionario cargado y procesado
     """
-    print("Cargando diccionario...")
+    print("Cargando diccionario de astrología...")
 
     try:
         # Cargar el diccionario desde el archivo CSV
         diccionario = pd.read_csv(DICCIONARIO_FILE, encoding='latin1')
-        print(f"Diccionario cargado con {len(diccionario)} términos.")
+
+        # Renombrar las columnas para mayor claridad
+        if len(diccionario.columns) >= 2:
+            diccionario.columns = ['Palabra', 'Frecuencia']
+
+        # Limpiar frecuencias (convertir a valores numéricos)
+        def limpiar_frecuencia(valor):
+            if pd.isna(valor) or valor == '':
+                return 0
+            # Si es un número, convertirlo directamente
+            if isinstance(valor, (int, float)):
+                return float(valor)
+            # Si es string, limpiar y convertir
+            valor_str = str(valor).replace('"', '').replace(',', '')
+            # Intentar convertir a float
+            try:
+                return float(valor_str)
+            except ValueError:
+                return 0
+
+        diccionario['Frecuencia_Limpia'] = diccionario['Frecuencia'].apply(limpiar_frecuencia)
+
+        # Ordenar por frecuencia descendente y eliminar valores con frecuencia 0
+        diccionario = diccionario[diccionario['Frecuencia_Limpia'] > 0].sort_values('Frecuencia_Limpia', ascending=False)
+
+        print(f"Diccionario cargado con {len(diccionario)} términos de astrología.")
         return diccionario
     except Exception as e:
         print(f"Error al cargar el diccionario: {e}")
-        return pd.DataFrame(columns=['Text', '30'])
+        return pd.DataFrame(columns=['Palabra', 'Frecuencia', 'Frecuencia_Limpia'])
 
 def cargar_listas_sentimientos():
     """
-    Carga las listas de palabras positivas, negativas y neutrales para análisis de sentimiento.
+    Carga las listas de palabras positivas, negativas y neutrales para análisis de sentimiento,
+    filtrando solamente las entradas relacionadas con astrología.
 
-    Esta función lee tres archivos CSV con palabras clasificadas según su sentimiento
-    y las convierte en conjuntos para facilitar la búsqueda.
+    Esta función lee tres archivos CSV con palabras clasificadas según su sentimiento,
+    filtra solo las filas donde Pseudociencia es 'astrologia' y convierte las palabras
+    en conjuntos para facilitar la búsqueda.
 
     Returns:
         tuple: Tupla con tres conjuntos (set) de palabras (positivas, negativas, neutrales)
@@ -147,15 +175,54 @@ def cargar_listas_sentimientos():
         negativas = pd.read_csv(negativas_path, encoding='latin1')
         neutrales = pd.read_csv(neutrales_path, encoding='latin1')
 
+        # Filtrar solo las filas relacionadas con astrología
+        positivas = positivas[positivas['Pseudociencia'].str.lower() == 'astrologia']
+        negativas = negativas[negativas['Pseudociencia'].str.lower() == 'astrologia']
+        neutrales = neutrales[neutrales['Pseudociencia'].str.lower() == 'astrologia']
+
+        # Limpiar y procesar frecuencias
+        def limpiar_frecuencia(valor):
+            if pd.isna(valor) or valor == '':
+                return 0
+            # Si ya es un número, devolverlo como está
+            if isinstance(valor, (int, float)):
+                return float(valor)
+            # Convertir a string y limpiar comillas y comas
+            valor_str = str(valor).replace('"', '').replace(',', '')
+            # Intentar convertir a float
+            try:
+                return float(valor_str)
+            except ValueError:
+                return 0
+
+        # Añadir columnas de frecuencia limpia
+        if 'Frecuencia' in positivas.columns:
+            positivas['Frecuencia_Limpia'] = positivas['Frecuencia'].apply(limpiar_frecuencia)
+            positivas = positivas.sort_values('Frecuencia_Limpia', ascending=False)
+
+        if 'Frecuencia' in negativas.columns:
+            negativas['Frecuencia_Limpia'] = negativas['Frecuencia'].apply(limpiar_frecuencia)
+            negativas = negativas.sort_values('Frecuencia_Limpia', ascending=False)
+
+        if 'Frecuencia' in neutrales.columns:
+            neutrales['Frecuencia_Limpia'] = neutrales['Frecuencia'].apply(limpiar_frecuencia)
+            neutrales = neutrales.sort_values('Frecuencia_Limpia', ascending=False)
+
         # Extraer solo las palabras y convertirlas a conjuntos para búsqueda eficiente
         palabras_positivas = set(positivas['Palabra'].dropna().astype(str).str.lower().values)
         palabras_negativas = set(negativas['Palabra'].dropna().astype(str).str.lower().values)
         palabras_neutrales = set(neutrales['Palabra'].dropna().astype(str).str.lower().values)
 
         # Mostrar estadísticas de palabras cargadas
-        print(f"Palabras positivas: {len(palabras_positivas)}")
-        print(f"Palabras negativas: {len(palabras_negativas)}")
-        print(f"Palabras neutrales: {len(palabras_neutrales)}")
+        print(f"Palabras positivas para astrología: {len(palabras_positivas)}")
+        print(f"Palabras negativas para astrología: {len(palabras_negativas)}")
+        print(f"Palabras neutrales para astrología: {len(palabras_neutrales)}")
+
+        # Guardar las listas procesadas para referencia
+        positivas.to_csv(os.path.join(BASE_DIR, 'astrologia_palabras_positivas.csv'), index=False)
+        negativas.to_csv(os.path.join(BASE_DIR, 'astrologia_palabras_negativas.csv'), index=False)
+        neutrales.to_csv(os.path.join(BASE_DIR, 'astrologia_palabras_neutrales.csv'), index=False)
+        print("Listas de palabras guardadas con frecuencias procesadas.")
 
         return palabras_positivas, palabras_negativas, palabras_neutrales
 
@@ -487,6 +554,14 @@ def main():
     # 1. Cargar datos
     tweets_df = cargar_tweets()
     palabras_positivas, palabras_negativas, palabras_neutrales = cargar_listas_sentimientos()
+
+    # Cargar diccionario general de astrología para enriquecer el análisis
+    diccionario_astrologia = cargar_diccionario()
+
+    # Guardar las primeras 100 palabras más frecuentes del diccionario
+    top_palabras = diccionario_astrologia.head(100)
+    top_palabras.to_csv(os.path.join(BASE_DIR, 'top_palabras_astrologia.csv'), index=False)
+    print(f"Top 100 palabras de astrología guardadas en 'top_palabras_astrologia.csv'")
 
     if len(tweets_df) == 0:
         print("No hay tweets para analizar.")

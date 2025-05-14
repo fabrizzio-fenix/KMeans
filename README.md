@@ -1,91 +1,100 @@
-# Análisis de Pseudociencias: Detección de Sentimientos en Tweets
+# Análisis de Tweets sobre Astrología
 
-Este proyecto implementa un análisis automatizado de tweets relacionados con pseudociencias, especialmente astrología, mediante técnicas de procesamiento de lenguaje natural y aprendizaje automático.
+## Descripción
+Este proyecto realiza un análisis de sentimiento y clustering de tweets relacionados con astrología, utilizando técnicas de procesamiento de lenguaje natural y aprendizaje automático. El análisis incluye:
 
-## Contenido de la Carpeta
+1. Clasificación por sentimiento (positivo, negativo, neutral)
+2. Agrupación de tweets similares mediante K-means
+3. Visualizaciones para el análisis de resultados
 
-- **analisis_pseudociencias.py**: Script principal que implementa el análisis de sentimientos, clustering y visualizaciones.
-- **requirements.txt**: Lista de dependencias necesarias para ejecutar el proyecto.
-- **Archivos de diccionario**:
-  - **diccionario_Final_Astrologia.csv**: Diccionario con términos de astrología y sus frecuencias.
-  - **AnalisisPositivo.csv**: Palabras clasificadas como positivas.
-  - **AnalisisNegativo.csv**: Palabras clasificadas como negativas.
-  - **AnalisisNeutral.csv**: Palabras clasificadas como neutrales.
-- **Astrologia/**: Directorio con archivos CSV que contienen tweets sobre astrología.
-- **graficas/**: Directorio donde se guardan las visualizaciones generadas.
-- **resultados_analisis.csv**: Archivo con los resultados del análisis (generado por el script).
+## Características principales
+- **Análisis de sentimiento**: Clasifica los tweets como positivos, negativos o neutrales basado en diccionarios específicos para astrología.
+- **Clustering con K-means**: Agrupa tweets similares para identificar temas comunes.
+- **Clasificación Naive Bayes**: Implementa un clasificador para predecir el sentimiento de nuevos tweets.
+- **Visualizaciones**: Genera gráficos de barras, gráficos circulares y nubes de palabras para facilitar el análisis.
+- **Procesamiento de diccionarios**: Limpia y procesa las frecuencias de palabras para un análisis más preciso.
 
-## Objetivo del Proyecto
+## Estructura del proyecto
+```
+.
+├── analisis_pseudociencias.py   # Script principal de análisis
+├── Astrologia/                  # Carpeta con archivos CSV de tweets
+│   ├── Astrologia1.csv
+│   ├── Astrologia2.csv
+│   └── ...
+├── AnalisisPositivo.csv         # Diccionario original de palabras positivas
+├── AnalisisNegativo.csv         # Diccionario original de palabras negativas
+├── AnalisisNeutral.csv          # Diccionario original de palabras neutrales
+├── diccionario_Final_Astrologia.csv # Diccionario general de astrología
+├── astrologia_palabras_positivas.csv  # Palabras positivas de astrología procesadas
+├── astrologia_palabras_negativas.csv  # Palabras negativas de astrología procesadas
+├── astrologia_palabras_neutrales.csv  # Palabras neutrales de astrología procesadas
+├── top_palabras_astrologia.csv  # Top 100 palabras más frecuentes de astrología
+├── graficas/                    # Directorio donde se guardan las visualizaciones
+├── resultados_analisis.csv      # Resultados del análisis
+└── README.md                    # Documentación del proyecto
+```
 
-El objetivo principal es analizar el sentimiento de tweets relacionados con pseudociencias y descubrir patrones en cómo las personas hablan sobre estos temas en redes sociales. El proyecto utiliza:
+## Requisitos
+- Python 3.6+
+- Pandas
+- NumPy
+- Matplotlib
+- Scikit-learn
+- WordCloud
+- Seaborn
 
-1. **Clasificación basada en diccionario**: Identifica palabras positivas, negativas y neutrales para determinar el sentimiento general de los tweets.
-2. **Aprendizaje no supervisado (K-means)**: Agrupa tweets similares sin etiquetas previas.
-3. **Aprendizaje supervisado (Naive Bayes)**: Clasifica tweets según su sentimiento, aprendiendo de ejemplos etiquetados.
+Puedes instalar todas las dependencias con:
+```
+pip install -r requirements.txt
+```
 
-## Funcionalidades Principales
+## Uso
+Para ejecutar el análisis completo:
+```
+python analisis_pseudociencias.py
+```
 
-### 1. Análisis de Sentimientos
-- Clasifica automáticamente tweets como positivos, negativos o neutrales.
-- Utiliza diccionarios de palabras precargados para identificar el sentimiento predominante.
-
-### 2. Clustering con K-means
-- Agrupa tweets similares en clusters basados en su contenido.
-- Identifica las palabras más relevantes para cada cluster.
-- Descubre tendencias y temas comunes en las conversaciones sobre pseudociencias.
-
-### 3. Clasificación con Naive Bayes
-- Entrena un modelo para predecir automáticamente el sentimiento de nuevos tweets.
-- Evalúa la precisión del modelo mediante división en conjuntos de entrenamiento y prueba.
-
-### 4. Visualizaciones
-- **Gráficos de barras**: Distribución de tweets por sentimiento y cluster.
-- **Gráficos circulares**: Proporción de sentimientos en los tweets analizados.
-- **Nubes de palabras**: Visualiza las palabras más frecuentes por sentimiento y cluster.
+## Modificaciones recientes
+- **Filtrado por astrología**: El sistema está configurado para usar exclusivamente palabras relacionadas con astrología de los archivos de análisis de sentimiento.
+- **Procesamiento mejorado de diccionarios**: Se han implementado funciones para limpiar y normalizar las frecuencias de palabras en todos los diccionarios.
+- **Archivos adicionales**: El script ahora genera archivos CSV procesados con las palabras de astrología filtradas:
+  - `astrologia_palabras_positivas.csv`: Palabras positivas con sus frecuencias normalizadas
+  - `astrologia_palabras_negativas.csv`: Palabras negativas con sus frecuencias normalizadas
+  - `astrologia_palabras_neutrales.csv`: Palabras neutrales con sus frecuencias normalizadas
+  - `top_palabras_astrologia.csv`: Las 100 palabras más frecuentes del diccionario general
+- **Procesamiento de tweets**: Se ha mejorado la limpieza de texto para eliminar URLs, menciones, hashtags y caracteres especiales.
 
 ## Resultados
+Los resultados del análisis se guardan en:
 
-El análisis revela:
+1. **resultados_analisis.csv**: Contiene todos los tweets analizados con sus clasificaciones de sentimiento y cluster.
+2. **graficas/**: Directorio con visualizaciones generadas:
+   - **distribucion_sentimientos.png**: Gráfico de barras de la distribución de sentimientos.
+   - **proporcion_sentimientos.png**: Gráfico circular de la proporción de sentimientos.
+   - **nube_palabras_[sentimiento].png**: Nubes de palabras para cada tipo de sentimiento.
+   - **distribucion_clusters.png**: Distribución de tweets por cluster.
+   - **nube_palabras_cluster_[#].png**: Nubes de palabras para cada cluster.
 
-- Distribución de sentimientos hacia la astrología (positivos, negativos y neutrales).
-- Palabras clave asociadas con cada tipo de sentimiento.
-- Agrupaciones naturales de tweets que revelan diferentes aspectos del discurso sobre pseudociencias.
-- Un clasificador automático capaz de predecir el sentimiento de nuevos tweets.
+## Modelo de Machine Learning
+El proyecto implementa dos modelos de machine learning:
 
-## Cómo Ejecutar el Proyecto
+1. **K-means (no supervisado)**: Agrupa tweets similares en clusters basándose en su contenido. Utiliza vectorización TF-IDF para representar los textos numéricamente.
 
-1. **Instalar dependencias**:
-   ```
-   pip install -r requirements.txt
-   ```
+2. **Naive Bayes (supervisado)**: Clasificador para predecir el sentimiento de tweets. Utiliza un enfoque de bolsa de palabras (CountVectorizer) para la representación de texto.
 
-2. **Ejecutar el análisis**:
-   ```
-   python analisis_pseudociencias.py
-   ```
+## Interpretación de resultados
+- Los tweets se clasifican mayoritariamente como neutrales (43.684), con pocos tweets positivos (618) y muy pocos negativos (4).
+- Los clusters identifican diferentes temas dentro de los tweets de astrología:
+  - Cluster 0 (6.426 tweets): Tweets personales y horóscopos diarios
+  - Cluster 1 (2.159 tweets): Discusiones sobre creencias y el universo
+  - Cluster 2 (35.721 tweets): Retweets y contenido informativo sobre astrología
 
-3. **Revisar resultados**:
-   - Examinar el archivo `resultados_analisis.csv` para ver los tweets clasificados.
-   - Explorar el directorio `graficas/` para ver las visualizaciones generadas.
+## Análisis de palabras
+El procesamiento mejorado de los diccionarios ha revelado que:
+- Las palabras positivas más frecuentes para astrología son: "much" (585), "many" (517), "real" (171)
+- Las palabras negativas más frecuentes son: "other" (428), "little bit" (417), "any less" (353)
+- Las palabras más frecuentes del diccionario general son términos como "astrology" (15.195), "#Astrology" (12.846) y "for" (11.570)
 
-## Estructura del Código
-
-El script principal (`analisis_pseudociencias.py`) está organizado en funciones modulares:
-
-- **cargar_tweets()**: Lee los archivos CSV con tweets desde el directorio Astrologia/.
-- **cargar_listas_sentimientos()**: Carga las listas de palabras positivas, negativas y neutrales.
-- **limpiar_texto()**: Preprocesa el texto eliminando caracteres innecesarios.
-- **clasificar_tweets()**: Asigna etiquetas de sentimiento según palabras clave.
-- **aplicar_kmeans()**: Implementa clustering no supervisado.
-- **aplicar_naive_bayes()**: Entrena y evalúa un clasificador supervisado.
-- **generar_visualizaciones()**: Crea gráficos para facilitar el análisis.
-- **main()**: Coordina todo el proceso de análisis.
-
-## Extensiones Posibles
-
-Este proyecto puede expandirse de varias maneras:
-
-1. **Análisis temporal**: Estudiar cómo cambia el sentimiento hacia las pseudociencias a lo largo del tiempo.
-2. **Comparación entre pseudociencias**: Comparar cómo se habla de diferentes pseudociencias.
-3. **Análisis de redes**: Estudiar quién habla de pseudociencias y cómo se difunde la información.
-4. **Modelos más avanzados**: Implementar algoritmos de deep learning para mejorar la clasificación.
+## Autores
+Equipo de análisis de pseudociencias
